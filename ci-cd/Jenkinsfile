@@ -1,0 +1,46 @@
+pipeline {
+    agent any
+
+    environment {
+        DOCKERHUB_CREDENTIALS = credentials('dockerhub')
+    }
+
+    stages {
+        stage('Clone Repository') {
+            steps {
+                git 'https://github.com/your-repo/ai-cms.git'
+            }
+        }
+
+        stage('Build Docker Images') {
+            steps {
+                sh 'docker-compose build'
+            }
+        }
+
+        stage('Run Tests') {
+            steps {
+                sh 'docker-compose run backend npm test'
+                sh 'docker-compose run frontend npm run lint'
+            }
+        }
+
+        stage('Push Docker Images') {
+            steps {
+                withDockerRegistry([credentialsId: 'dockerhub']) {
+                    sh 'docker tag backend:latest your-dockerhub/ai-cms-backend:latest'
+                    sh 'docker push your-dockerhub/ai-cms-backend:latest'
+
+                    sh 'docker tag frontend:latest your-dockerhub/ai-cms-frontend:latest'
+                    sh 'docker push your-dockerhub/ai-cms-frontend:latest'
+                }
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                sh 'docker-compose up -d'
+            }
+        }
+    }
+}
