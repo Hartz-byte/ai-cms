@@ -1,3 +1,4 @@
+// pages/content.tsx
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import Link from "next/link";
 import useDarkMode from "@/hooks/useDarkMode";

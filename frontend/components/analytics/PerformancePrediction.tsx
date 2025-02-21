@@ -1,3 +1,4 @@
+// components/content/PerformancePrediction.tsx
 import { useState } from "react";
 import { predictPerformance } from "../../services/analyticsService";
 

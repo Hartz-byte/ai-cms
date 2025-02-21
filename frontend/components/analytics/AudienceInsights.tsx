@@ -1,3 +1,4 @@
+// component/analytics/AudienceInsights.tsx
 const AudienceInsights = () => {
   return (
     <div className="p-6 bg-card dark:bg-darkCard shadow-modern rounded-xl transition-colors duration-300">

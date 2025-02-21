@@ -1,3 +1,4 @@
+// pages/content/create.tsx
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { useState } from "react";
 import { useRouter } from "next/router";

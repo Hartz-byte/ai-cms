@@ -1,3 +1,4 @@
+// pages/analytics.tsx
 import { NextPage } from "next";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import AudienceInsights from "@/components/analytics/AudienceInsights";
