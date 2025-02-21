@@ -7,7 +7,7 @@ import PerformancePrediction from "@/components/analytics/PerformancePrediction"
 import useAuth from "@/hooks/useAuth";
 
 const Dashboard: NextPage = () => {
-  // useAuth();
+  useAuth();
 
   return (
     <DashboardLayout title="Dashboard">
