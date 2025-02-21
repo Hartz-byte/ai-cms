@@ -1,3 +1,4 @@
+// components/layout/Sidebar.tsx
 import Link from "next/link";
 import { FaHome, FaChartBar, FaPen, FaMoon, FaSun } from "react-icons/fa";
 import useDarkMode from "@/hooks/useDarkMode";
