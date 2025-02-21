@@ -1,12 +1,14 @@
-// pages/dashboard.tsx
 import { NextPage } from "next";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import ContentEditor from "@/components/content/ContentEditor";
 import SEOOptimizer from "@/components/content/SEOOptimizer";
 import ScheduleAssistant from "@/components/content/ScheduleAssistant";
 import PerformancePrediction from "@/components/analytics/PerformancePrediction";
+import useAuth from "@/hooks/useAuth";
 
 const Dashboard: NextPage = () => {
+  useAuth();
+
   return (
     <DashboardLayout title="Dashboard">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

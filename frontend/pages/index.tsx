@@ -16,21 +16,16 @@ const Home: NextPage = () => {
         Intelligent content management made easy.
       </p>
 
-      <Link href="/dashboard">
+      {/* <Link href="/dashboard">
         <button className="mt-6 px-6 py-2 bg-blue-600 text-white rounded">
           Go to Dashboard
         </button>
-      </Link>
+      </Link> */}
 
       <div className="mt-6 flex gap-4">
-        <Link href="/auth/login">
+        <Link href="/auth/auth">
           <button className="px-6 py-2 bg-blue-600 text-white rounded">
-            Login
-          </button>
-        </Link>
-        <Link href="/auth/register">
-          <button className="px-6 py-2 bg-green-600 text-white rounded">
-            Register
+            Login / Register
           </button>
         </Link>
       </div>

@@ -33,7 +33,10 @@ const Sidebar = () => {
       )}
 
       <button
-        onClick={() => router.push("/")}
+        onClick={() => {
+          localStorage.removeItem("token");
+          router.push("/");
+        }}
         className="mt-4 p-3 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
       >
         Logout
