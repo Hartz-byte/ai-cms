@@ -4,6 +4,62 @@ import StarterKit from "@tiptap/starter-kit";
 import { Button, Loader } from "@mantine/core";
 import axios from "axios";
 
+const stopWords = new Set([
+  "a",
+  "an",
+  "and",
+  "the",
+  "is",
+  "in",
+  "to",
+  "of",
+  "on",
+  "for",
+  "with",
+  "at",
+  "by",
+  "from",
+  "that",
+  "this",
+  "it",
+  "be",
+  "as",
+  "was",
+  "were",
+  "are",
+]);
+
+const extractKeywords = (text: string): string[] => {
+  const words = text.toLowerCase().match(/\b\w{4,}\b/g);
+  if (!words) return [];
+
+  const wordCount: Record<string, number> = {};
+  words.forEach((word) => {
+    if (!stopWords.has(word)) {
+      wordCount[word] = (wordCount[word] || 0) + 1;
+    }
+  });
+
+  return Object.keys(wordCount)
+    .sort((a, b) => wordCount[b] - wordCount[a])
+    .slice(0, 5);
+};
+
+const highlightKeywords = (content: string) => {
+  const keywords = extractKeywords(content);
+
+  let highlightedContent = content;
+  keywords.forEach((word) => {
+    const regex = new RegExp(`\\b(${word})\\b`, "gi");
+    highlightedContent = highlightedContent.replace(
+      regex,
+      `<mark class="bg-yellow-300 px-1 rounded">${word}</mark>`
+    );
+  });
+
+  return highlightedContent;
+};
+
 const AiWritingAssistant = () => {
   const [loading, setLoading] = useState(false);
   const [isClient, setIsClient] = useState(false);
@@ -17,12 +73,20 @@ const AiWritingAssistant = () => {
     content: "",
     editorProps: {
       attributes: {
-        class:
-          "w-full min-h-[150px] mt-2 p-4 border rounded-lg bg-transparent dark:bg-gray-700 text-black dark:text-white focus:ring-2 focus:ring-primary outline-none transition",
+        class: "border border-gray-300 rounded p-2 min-h-[150px]",
       },
     },
     immediatelyRender: false,
   });
+
+  useEffect(() => {
+    if (editor) {
+      editor.on("update", () => {
+        const updatedContent = highlightKeywords(editor.getHTML());
+        editor.commands.setContent(updatedContent);
+      });
+    }
+  }, [editor]);
 
   const handleAIAction = async (actionType: string) => {
     if (!editor) return;
@@ -43,14 +107,14 @@ const AiWritingAssistant = () => {
 
   return (
     <div className="p-6 bg-card dark:bg-darkCard shadow-modern rounded-xl transition-colors duration-300">
-      <h3 className="text-2xl font-semibold mb-4 text-black dark:text-white">
+      <h2 className="text-2xl font-semibold mb-2 text-black dark:text-white">
         AI Writing Assistant
-      </h3>
+      </h2>
 
       {isClient && editor ? (
-        <EditorContent editor={editor} />
+        <EditorContent editor={editor} className="text-black dark:text-white" />
       ) : (
-        <p className="text-black dark:text-white">Loading Editor...</p>
+        <p>Loading Editor...</p>
       )}
 
       <div className="flex gap-2 mt-4">

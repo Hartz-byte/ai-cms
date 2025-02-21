@@ -8,7 +8,7 @@ import useAuth from "@/hooks/useAuth";
 import AiWritingAssistant from "@/components/AiWritingAssistant/AiWritingAssistant";
 
 const Dashboard: NextPage = () => {
-  // useAuth();
+  useAuth();
 
   return (
     <DashboardLayout title="Dashboard">
