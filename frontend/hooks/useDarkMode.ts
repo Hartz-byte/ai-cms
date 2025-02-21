@@ -1,29 +1,43 @@
 import { useEffect, useState } from "react";
 
 const useDarkMode = () => {
-  const [darkMode, setDarkMode] = useState<boolean>(false);
-  const [isMounted, setIsMounted] = useState(false);
+  const [darkMode, setDarkMode] = useState<boolean>(() => {
+    if (typeof window !== "undefined") {
+      const stored = localStorage.getItem("darkMode");
+      if (stored !== null) {
+        return stored === "true";
+      }
+
+      return window.matchMedia("(prefers-color-scheme: dark)").matches;
+    }
+    return false;
+  });
 
   useEffect(() => {
-    setIsMounted(true);
-    const storedMode = localStorage.getItem("darkMode");
-    if (storedMode) {
-      setDarkMode(storedMode === "true");
-    }
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+    const handleChange = () => {
+      const stored = localStorage.getItem("darkMode");
+      if (stored === null) {
+        setDarkMode(mediaQuery.matches);
+      }
+    };
+
+    mediaQuery.addEventListener("change", handleChange);
+    return () => mediaQuery.removeEventListener("change", handleChange);
   }, []);
 
   useEffect(() => {
-    if (isMounted) {
+    if (typeof window !== "undefined") {
       if (darkMode) {
         document.documentElement.classList.add("dark");
       } else {
         document.documentElement.classList.remove("dark");
       }
-      localStorage.setItem("darkMode", JSON.stringify(darkMode));
+      localStorage.setItem("darkMode", darkMode.toString());
     }
-  }, [darkMode, isMounted]);
+  }, [darkMode]);
 
-  return { darkMode, setDarkMode, isMounted };
+  return { darkMode, setDarkMode };
 };
 
 export default useDarkMode;

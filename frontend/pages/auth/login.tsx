@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
-import { login } from "../services/authService";
+import Link from "next/link";
+import { login } from "@/services/authService";
 
 const Login = () => {
   const router = useRouter();
@@ -23,16 +24,21 @@ const Login = () => {
   };
 
   return (
-    <div className="flex items-center justify-center h-screen bg-gray-100">
-      <form className="bg-white p-8 shadow-lg rounded" onSubmit={handleSubmit}>
-        <h2 className="text-2xl font-bold mb-6">Login</h2>
+    <div className="flex items-center justify-center h-screen bg-gray-100 dark:bg-darkBackground transition-colors">
+      <form
+        className="bg-white dark:bg-gray-800 p-8 shadow-lg rounded"
+        onSubmit={handleSubmit}
+      >
+        <h2 className="text-2xl font-bold mb-6 text-gray-700 dark:text-white">
+          Login
+        </h2>
         {error && <p className="text-red-500 mb-4">{error}</p>}
         <input
           name="email"
           placeholder="Email"
           value={credentials.email}
           onChange={handleChange}
-          className="mb-4 p-2 border rounded w-full"
+          className="mb-4 p-2 border rounded w-full dark:bg-gray-700 dark:text-white"
           required
         />
         <input
@@ -41,15 +47,21 @@ const Login = () => {
           placeholder="Password"
           value={credentials.password}
           onChange={handleChange}
-          className="mb-4 p-2 border rounded w-full"
+          className="mb-4 p-2 border rounded w-full dark:bg-gray-700 dark:text-white"
           required
         />
         <button
           type="submit"
-          className="bg-blue-600 text-white py-2 px-4 rounded"
+          className="bg-blue-600 text-white py-2 px-4 rounded w-full"
         >
           Login
         </button>
+        <p className="mt-4 text-gray-600 dark:text-gray-300 text-center">
+          Don't have an account?{" "}
+          <Link href="/auth/register" className="text-blue-500">
+            Register
+          </Link>
+        </p>
       </form>
     </div>
   );
