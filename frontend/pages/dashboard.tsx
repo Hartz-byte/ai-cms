@@ -5,9 +5,10 @@ import SEOOptimizer from "@/components/content/SEOOptimizer";
 import ScheduleAssistant from "@/components/content/ScheduleAssistant";
 import PerformancePrediction from "@/components/analytics/PerformancePrediction";
 import useAuth from "@/hooks/useAuth";
+import AiWritingAssistant from "@/components/AiWritingAssistant/AiWritingAssistant";
 
 const Dashboard: NextPage = () => {
-  useAuth();
+  // useAuth();
 
   return (
     <DashboardLayout title="Dashboard">
@@ -20,6 +21,8 @@ const Dashboard: NextPage = () => {
         <ScheduleAssistant />
         <PerformancePrediction />
       </div>
+
+      <AiWritingAssistant />
     </DashboardLayout>
   );
 };
