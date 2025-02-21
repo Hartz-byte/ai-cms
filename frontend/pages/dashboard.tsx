@@ -1,5 +1,6 @@
 // pages/dashboard.tsx
 import { NextPage } from "next";
+
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import useAuth from "@/hooks/useAuth";
 import ContentEditor from "@/components/content/ContentEditor";

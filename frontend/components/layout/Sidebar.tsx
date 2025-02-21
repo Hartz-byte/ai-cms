@@ -1,9 +1,9 @@
-// components/layout/Sidebar.tsx
 import Link from "next/link";
 import { FaHome, FaChartBar, FaPen, FaMoon, FaSun } from "react-icons/fa";
-import useDarkMode from "@/hooks/useDarkMode";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
+
+import useDarkMode from "@/hooks/useDarkMode";
 
 const Sidebar = () => {
   const { darkMode, setDarkMode } = useDarkMode();
@@ -15,33 +15,43 @@ const Sidebar = () => {
   }, []);
 
   return (
-    <aside className="w-64 bg-background dark:bg-darkBackground shadow-modern flex flex-col p-6 transition-colors duration-300">
+    <aside
+      className={`fixed left-0 top-0 w-64 h-screen bg-background dark:bg-darkBackground 
+      ${
+        darkMode ? "shadow-md" : "shadow-2xl"
+      } flex flex-col p-6 transition-colors duration-300`}
+    >
       <h1 className="text-3xl font-bold text-primary mb-8">AI CMS</h1>
 
-      <nav className="flex flex-col space-y-4">
-        <NavItem href="/dashboard" icon={<FaHome />} label="Dashboard" />
-        <NavItem href="/content" icon={<FaPen />} label="Content" />
-        <NavItem href="/analytics" icon={<FaChartBar />} label="Analytics" />
-      </nav>
+      <div className="flex-grow">
+        <nav className="flex flex-col space-y-4">
+          <NavItem href="/dashboard" icon={<FaHome />} label="Dashboard" />
+          <NavItem href="/content" icon={<FaPen />} label="Content" />
+          <NavItem href="/analytics" icon={<FaChartBar />} label="Analytics" />
+        </nav>
+      </div>
 
-      {mounted && (
+      <div className="flex flex-col gap-4">
+        {mounted && (
+          <button
+            onClick={() => setDarkMode((prev) => !prev)}
+            className="flex items-center justify-center gap-3 p-3 rounded-lg bg-green-600 hover:bg-primary text-white transition"
+          >
+            {darkMode ? <FaSun /> : <FaMoon />} {darkMode ? "Light" : "Dark"}{" "}
+            Mode
+          </button>
+        )}
+
         <button
-          onClick={() => setDarkMode((prev) => !prev)}
-          className="mt-auto flex items-center gap-3 p-3 rounded-lg bg-accent hover:bg-primary text-white transition"
+          onClick={() => {
+            localStorage.removeItem("token");
+            router.push("/");
+          }}
+          className="p-3 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
         >
-          {darkMode ? <FaSun /> : <FaMoon />} {darkMode ? "Light" : "Dark"} Mode
+          Logout
         </button>
-      )}
-
-      <button
-        onClick={() => {
-          localStorage.removeItem("token");
-          router.push("/");
-        }}
-        className="mt-4 p-3 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
-      >
-        Logout
-      </button>
+      </div>
     </aside>
   );
 };

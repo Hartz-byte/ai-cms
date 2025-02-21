@@ -6,7 +6,7 @@ const CompetitorTracking = () => {
   ];
 
   return (
-    <div className="p-6 bg-card dark:bg-darkCard shadow-modern rounded-xl">
+    <div className="p-6 bg-card dark:bg-darkCard shadow-2xl rounded-xl">
       <h3 className="text-2xl font-semibold mb-4 text-black dark:text-white">
         🚀 Competitor Tracking
       </h3>

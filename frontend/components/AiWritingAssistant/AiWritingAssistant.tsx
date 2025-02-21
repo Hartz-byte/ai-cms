@@ -1,65 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
+import Placeholder from "@tiptap/extension-placeholder";
 import { Button, Loader } from "@mantine/core";
 import ContentScheduler from "../ContentScheduler/ContentScheduler";
 import axios from "axios";
-
-const stopWords = new Set([
-  "a",
-  "an",
-  "and",
-  "the",
-  "is",
-  "in",
-  "to",
-  "of",
-  "on",
-  "for",
-  "with",
-  "at",
-  "by",
-  "from",
-  "that",
-  "this",
-  "it",
-  "be",
-  "as",
-  "was",
-  "were",
-  "are",
-]);
-
-const extractKeywords = (text: string): string[] => {
-  const words = text.toLowerCase().match(/\b\w{4,}\b/g);
-  if (!words) return [];
-
-  const wordCount: Record<string, number> = {};
-  words.forEach((word) => {
-    if (!stopWords.has(word)) {
-      wordCount[word] = (wordCount[word] || 0) + 1;
-    }
-  });
-
-  return Object.keys(wordCount)
-    .sort((a, b) => wordCount[b] - wordCount[a])
-    .slice(0, 5);
-};
-
-const highlightKeywords = (content: string) => {
-  const keywords = extractKeywords(content);
-
-  let highlightedContent = content;
-  keywords.forEach((word) => {
-    const regex = new RegExp(`\\b(${word})\\b`, "gi");
-    highlightedContent = highlightedContent.replace(
-      regex,
-      `<mark class="bg-yellow-300 px-1 rounded">${word}</mark>`
-    );
-  });
-
-  return highlightedContent;
-};
 
 const AiWritingAssistant = () => {
   const [loading, setLoading] = useState(false);
@@ -71,24 +16,21 @@ const AiWritingAssistant = () => {
   }, []);
 
   const editor = useEditor({
-    extensions: [StarterKit],
+    extensions: [
+      StarterKit,
+      Placeholder.configure({
+        placeholder: "Start writing here...",
+      }),
+    ],
     content: "",
     editorProps: {
       attributes: {
-        class: "border border-gray-300 rounded p-2 min-h-[150px]",
+        class:
+          "border border-gray-300 rounded p-2 min-h-[150px] text-black dark:text-white bg-transparent dark:bg-gray-700",
       },
     },
     immediatelyRender: false,
   });
-
-  useEffect(() => {
-    if (editor) {
-      editor.on("update", () => {
-        const updatedContent = highlightKeywords(editor.getHTML());
-        editor.commands.setContent(updatedContent);
-      });
-    }
-  }, [editor]);
 
   const handleAIAction = async (actionType: string) => {
     if (!editor) return;
@@ -114,13 +56,13 @@ const AiWritingAssistant = () => {
   };
 
   return (
-    <div className="p-6 bg-card dark:bg-darkCard shadow-modern rounded-xl transition-colors duration-300">
-      <h2 className="text-2xl font-semibold mb-2 text-black dark:text-white">
-        AI Writing Assistant
+    <div className="p-6 bg-card dark:bg-darkCard shadow-2xl rounded-xl transition-colors duration-300">
+      <h2 className="text-2xl font-semibold mb-6 text-black dark:text-white">
+        🤖✍️ AI Writing Assistant
       </h2>
 
       {isClient && editor ? (
-        <EditorContent editor={editor} className="text-black dark:text-white" />
+        <EditorContent editor={editor} />
       ) : (
         <p>Loading Editor...</p>
       )}
@@ -146,7 +88,7 @@ const AiWritingAssistant = () => {
 
         <Button
           color="yellow"
-          className="px-6 py-2 rounded-lg bg-yellow-500 text-black hover:bg-yellow-600 transition"
+          className="px-6 py-2 rounded-lg bg-yellow-500 hover:bg-yellow-600 transition"
           onClick={() => handleAIAction("improve")}
           disabled={loading}
         >

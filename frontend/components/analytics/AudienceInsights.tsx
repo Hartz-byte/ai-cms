@@ -12,9 +12,9 @@ const AudienceInsights = () => {
   }, []);
 
   return (
-    <div className="p-6 bg-card dark:bg-darkCard shadow-modern rounded-xl">
+    <div className="p-6 bg-card dark:bg-darkCard shadow-2xl rounded-xl">
       <h3 className="text-2xl font-semibold mb-4 text-black dark:text-white">
-        Audience Insights
+        📈 Audience Insights
       </h3>
       <p className="text-gray-600 dark:text-gray-300">
         Get in-depth insights into your audience engagement and demographics.

@@ -17,10 +17,11 @@ const ScheduleAssistant = () => {
   };
 
   return (
-    <div className="p-6 bg-card dark:bg-darkCard shadow-modern rounded-xl transition-colors duration-300">
+    <div className="p-6 bg-card dark:bg-darkCard shadow-2xl rounded-xl transition-colors duration-300">
       <h2 className="text-xl font-semibold mb-4 text-black dark:text-white">
-        AI Content Scheduling
+        🤖📅 AI Content Scheduling
       </h2>
+
       <textarea
         value={content}
         onChange={(e) => setContent(e.target.value)}

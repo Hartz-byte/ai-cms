@@ -76,7 +76,7 @@ const ContentScheduler = ({
   });
 
   return (
-    <div className="p-6 bg-white dark:bg-darkCard shadow-modern rounded-xl">
+    <div>
       <h3 className="text-2xl font-semibold mb-4 text-gray-900 dark:text-white">
         📅 Content Scheduler
       </h3>
@@ -84,7 +84,7 @@ const ContentScheduler = ({
       <Button
         onClick={() => setOpened(true)}
         color="blue"
-        className="text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 transition-all duration-300"
+        className="text-white bg-primary hover:bg-accent dark:bg-primary dark:hover:bg-accent transition-all duration-300"
       >
         Schedule Post
       </Button>
@@ -127,7 +127,10 @@ const ContentScheduler = ({
             value={selectedTime}
             onChange={(event) => setSelectedTime(event.currentTarget.value)}
             label="Select Time"
-            className="w-2/3 text-black"
+            className="w-2/3 text-black text-center"
+            styles={{
+              input: { textAlign: "center" },
+            }}
           />
 
           {/* Image Upload */}

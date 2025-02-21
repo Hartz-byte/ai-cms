@@ -17,10 +17,11 @@ const PerformancePrediction = () => {
   };
 
   return (
-    <div className="p-6 bg-card dark:bg-darkCard rounded-xl shadow rounded">
+    <div className="p-6 bg-card dark:bg-darkCard rounded-xl shadow-2xl rounded">
       <h2 className="text-xl font-semibold mb-4 text-black dark:text-white">
-        AI Content Performance Prediction
+        🤖📊 AI Content Performance Prediction
       </h2>
+
       <textarea
         placeholder="Enter content for analysis..."
         value={content}

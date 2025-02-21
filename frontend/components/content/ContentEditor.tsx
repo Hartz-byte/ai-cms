@@ -5,10 +5,11 @@ const ContentEditor = () => {
   const [content, setContent] = useState("");
 
   return (
-    <div className="p-6 bg-card dark:bg-darkCard shadow-modern rounded-xl transition-colors duration-300">
+    <div className="p-6 bg-card dark:bg-darkCard shadow-2xl rounded-xl transition-colors duration-300">
       <h3 className="text-2xl font-semibold mb-4 text-black dark:text-white">
-        AI-Powered Content Editor
+        ✨📝 AI-Powered Content Editor
       </h3>
+
       <textarea
         className="w-full h-40 mt-2 p-4 border rounded-lg bg-transparent dark:bg-gray-700 text-black dark:text-white focus:ring-2 focus:ring-primary outline-none transition"
         placeholder="Start writing..."

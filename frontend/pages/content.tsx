@@ -36,7 +36,7 @@ const ContentPage = () => {
           </h2>
           <Link
             href="/content/create"
-            className="px-6 py-2 bg-accent text-white rounded-lg hover:bg-primary transition"
+            className="px-6 py-2 bg-accent text-white shadow-2xl rounded-lg hover:bg-primary transition"
           >
             + Create New Content
           </Link>
@@ -47,13 +47,15 @@ const ContentPage = () => {
             {dummyContent.map((content) => (
               <div
                 key={content.id}
-                className={`p-4 rounded-lg shadow-modern transition-colors duration-300 ${
+                className={`p-4 rounded-lg shadow-2xl bg-white dark:bg-darkCard transition-colors duration-300 ${
                   darkMode
                     ? "bg-darkBackground text-white"
                     : "bg-background text-gray-800"
                 }`}
               >
-                <h3 className="text-xl font-semibold">{content.title}</h3>
+                <h3 className="text-xl font-semibold text-black dark:text-white">
+                  {content.title}
+                </h3>
                 <p
                   className={`mt-2 ${
                     darkMode ? "text-gray-400" : "text-gray-600"
