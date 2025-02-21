@@ -1,7 +1,8 @@
-// pages/_app.tsx
 import { AppProps } from "next/app";
 import { MantineProvider } from "@mantine/core";
 import Head from "next/head";
+import "@mantine/core/styles.css";
+import "@mantine/dates/styles.css";
 import "../styles/globals.css";
 
 export default function MyApp({ Component, pageProps }: AppProps) {

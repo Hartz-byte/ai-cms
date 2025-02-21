@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { Button, Loader } from "@mantine/core";
+import ContentScheduler from "../ContentScheduler/ContentScheduler";
 import axios from "axios";
 
 const stopWords = new Set([
@@ -63,6 +64,7 @@ const highlightKeywords = (content: string) => {
 const AiWritingAssistant = () => {
   const [loading, setLoading] = useState(false);
   const [isClient, setIsClient] = useState(false);
+  const [scheduledPosts, setScheduledPosts] = useState<string[]>([]);
 
   useEffect(() => {
     setIsClient(true);
@@ -105,6 +107,12 @@ const AiWritingAssistant = () => {
     setLoading(false);
   };
 
+  const handleSchedule = (datetime: string) => {
+    console.log("Scheduled for:", datetime);
+    setScheduledPosts((prev) => [...prev, datetime]);
+    alert(`✅ Post Scheduled for ${datetime}!`);
+  };
+
   return (
     <div className="p-6 bg-card dark:bg-darkCard shadow-modern rounded-xl transition-colors duration-300">
       <h2 className="text-2xl font-semibold mb-2 text-black dark:text-white">
@@ -145,6 +153,25 @@ const AiWritingAssistant = () => {
           {loading ? <Loader size="xs" color="black" /> : "Improve Grammar"}
         </Button>
       </div>
+
+      {/* ✅ Integrated Content Scheduler */}
+      <div className="mt-6">
+        <ContentScheduler onSchedule={handleSchedule} />
+      </div>
+
+      {/* ✅ Display Scheduled Posts */}
+      {scheduledPosts.length > 0 && (
+        <div className="mt-6 p-4 bg-gray-100 dark:bg-gray-800 rounded-lg">
+          <h3 className="text-lg font-semibold text-black dark:text-white mb-2">
+            📌 Scheduled Posts:
+          </h3>
+          <ul className="list-disc pl-5 text-black dark:text-white">
+            {scheduledPosts.map((post, index) => (
+              <li key={index}>{post}</li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   );
 };
