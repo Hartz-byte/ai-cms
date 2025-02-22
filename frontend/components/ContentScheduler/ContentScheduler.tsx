@@ -1,3 +1,4 @@
+// components/ContentScheduler/ContentScheduler.tsx
 import React, { useState } from "react";
 import { Button, Modal, Text, Image, Loader } from "@mantine/core";
 import { DatePicker, TimeInput } from "@mantine/dates";
@@ -5,8 +6,9 @@ import { useDropzone } from "react-dropzone";
 import dayjs from "dayjs";
 import axios from "axios";
 
-const CLOUDINARY_UPLOAD_PRESET = "your_upload_preset";
-const CLOUDINARY_CLOUD_NAME = "your_cloud_name";
+const CLOUDINARY_CLOUD_NAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+const CLOUDINARY_UPLOAD_PRESET =
+  process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
 
 const ContentScheduler = ({
   onSchedule,
@@ -26,39 +28,70 @@ const ContentScheduler = ({
   const [altText, setAltText] = useState<string>("");
   const [tags, setTags] = useState<string[]>([]);
 
-  /** 🔹 Handle Image Upload to Cloudinary */
+  // Function to reset form data
+  const resetForm = () => {
+    setSelectedDate(null);
+    setSelectedTime("12:00");
+    setImagePreview(null);
+    setAltText("");
+    setTags([]);
+  };
+
+  // Handle Image Upload to Cloudinary
   const onDrop = async (acceptedFiles: File[]) => {
     const file = acceptedFiles[0];
     if (!file) return;
 
     setUploading(true);
 
+    if (!CLOUDINARY_UPLOAD_PRESET || !CLOUDINARY_CLOUD_NAME) {
+      console.error("Missing Cloudinary credentials");
+      setUploading(false);
+      return;
+    }
+
     const formData = new FormData();
     formData.append("file", file);
     formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
-    formData.append("cloud_name", CLOUDINARY_CLOUD_NAME);
-    formData.append("auto_tagging", "0.7"); // AI Tagging
-    formData.append("context", "alt=auto"); // AI Alt Text
+
+    // formData.append("auto_tagging", "0.7");
+    // formData.append("context", "alt=auto");
 
     try {
-      const response = await axios.post(
-        `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`,
-        formData
+      console.log(
+        "Uploading to Cloudinary with preset:",
+        CLOUDINARY_UPLOAD_PRESET
       );
 
-      const { secure_url, context, tags: uploadedTags } = response.data;
+      const response = await axios.post(
+        `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
 
+      console.log("Cloudinary Response:", response.data);
+
+      const { secure_url, context, tags: uploadedTags } = response.data;
       setImagePreview(secure_url);
-      setAltText(context?.custom?.alt || "AI-generated description");
+      setAltText(context?.custom?.alt || "");
       setTags(uploadedTags || []);
-    } catch (error) {
-      console.error("Upload failed:", error);
+    } catch (error: any) {
+      console.error("Upload failed:", {
+        message: error.message,
+        response: error.response?.data,
+      });
+      // Add user feedback here
+      alert("Failed to upload image. Please try again.");
     } finally {
       setUploading(false);
     }
   };
 
-  /** 🔹 Handle Scheduling */
+  // Handle Scheduling
   const handleSchedule = () => {
     if (selectedDate && selectedTime) {
       const formattedDate = dayjs(selectedDate).format("YYYY-MM-DD");
@@ -66,10 +99,11 @@ const ContentScheduler = ({
 
       onSchedule(scheduledTime, imagePreview ?? undefined, altText, tags);
       setOpened(false);
+      resetForm();
     }
   };
 
-  /** 🔹 Dropzone for File Upload */
+  // Dropzone for File Upload
   const { getRootProps, getInputProps } = useDropzone({
     onDrop,
     accept: { "image/*": [] },
@@ -92,7 +126,10 @@ const ContentScheduler = ({
       {/* Styled Modal */}
       <Modal
         opened={opened}
-        onClose={() => setOpened(false)}
+        onClose={() => {
+          setOpened(false);
+          resetForm();
+        }}
         centered
         portalProps={{ target: "body" }}
         overlayProps={{
@@ -184,6 +221,7 @@ const ContentScheduler = ({
             >
               Cancel
             </Button>
+
             <Button
               color="green"
               onClick={handleSchedule}

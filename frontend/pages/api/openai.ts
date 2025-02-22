@@ -1,6 +1,8 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import axios from "axios";
 
+const COHERE_API_KEY = process.env.COHERE_API_KEY;
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
@@ -14,37 +16,47 @@ export default async function handler(
 
   switch (action) {
     case "expand":
-      prompt = `Expand the following content: "${content}"`;
+      prompt = `Expand on the following idea with more depth, details, and clarity while maintaining a natural and engaging tone: "${content}"`;
       break;
     case "rewrite":
-      prompt = `Rewrite the following content in a better way: "${content}"`;
+      prompt = `Rephrase the following text in a clearer, more professional, and natural way while preserving its original meaning: "${content}"`;
       break;
     case "improve":
-      prompt = `Improve the grammar and clarity of: "${content}"`;
+      prompt = `Refine the following text by enhancing its grammar, readability, and overall fluency while ensuring it sounds polished and natural: "${content}"`;
       break;
     default:
       return res.status(400).json({ error: "Invalid action type" });
   }
 
+  if (!COHERE_API_KEY) {
+    return res.status(500).json({ error: "Missing Cohere API Key" });
+  }
+
   try {
     const response = await axios.post(
-      "https://api.openai.com/v1/completions",
+      "https://api.cohere.ai/v1/generate",
       {
-        model: "text-davinci-003",
+        model: "command-xlarge-nightly",
         prompt: prompt,
-        max_tokens: 200,
-        temperature: 0.7,
+        max_tokens: 100,
       },
       {
         headers: {
-          Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+          Authorization: `Bearer ${COHERE_API_KEY}`,
+          "Content-Type": "application/json",
         },
       }
     );
 
-    return res.status(200).json({ text: response.data.choices[0].text.trim() });
-  } catch (error) {
-    console.error("OpenAI API Error:", error);
-    return res.status(500).json({ error: "AI Request Failed" });
+    // console.log("AI response: ", response.data);
+
+    return res
+      .status(200)
+      .json({ text: response.data.generations[0].text.trim() });
+  } catch (error: any) {
+    console.error("Cohere API Error:", error.response?.data || error.message);
+    return res
+      .status(500)
+      .json({ error: "AI Request Failed", details: error.response?.data });
   }
 }
