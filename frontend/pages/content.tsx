@@ -30,18 +30,6 @@ const ContentPage = () => {
   return (
     <DashboardLayout title="Content Management">
       <div className="p-6">
-        <header className="flex justify-between items-center mb-8">
-          <h2 className="text-3xl font-bold text-primary">
-            Content Management
-          </h2>
-          <Link
-            href="/content/create"
-            className="px-6 py-2 bg-accent text-white shadow-2xl rounded-lg hover:bg-primary transition"
-          >
-            + Create New Content
-          </Link>
-        </header>
-
         {dummyContent.length > 0 ? (
           <div className="space-y-6">
             {dummyContent.map((content) => (
