@@ -1,5 +1,13 @@
+// components/layout/Sidebar.tsx
 import Link from "next/link";
-import { FaHome, FaChartBar, FaPen, FaMoon, FaSun } from "react-icons/fa";
+import {
+  FaHome,
+  FaChartBar,
+  FaPen,
+  FaMoon,
+  FaSun,
+  FaRobot,
+} from "react-icons/fa";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 
@@ -27,6 +35,7 @@ const Sidebar = () => {
         <nav className="flex flex-col space-y-4">
           <NavItem href="/dashboard" icon={<FaHome />} label="Dashboard" />
           <NavItem href="/content" icon={<FaPen />} label="Content" />
+          <NavItem href="/chat" icon={<FaRobot />} label="Chat Bot" />
           <NavItem href="/analytics" icon={<FaChartBar />} label="Analytics" />
         </nav>
       </div>
