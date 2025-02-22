@@ -11,6 +11,7 @@ const AiWritingAssistant = () => {
   const [loading, setLoading] = useState(false);
   const [isClient, setIsClient] = useState(false);
   const [scheduledPosts, setScheduledPosts] = useState<string[]>([]);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
@@ -50,6 +51,21 @@ const AiWritingAssistant = () => {
     setLoading(false);
   };
 
+  const handleClear = () => {
+    if (editor) editor.commands.clearContent();
+  };
+
+  const handleCopy = async () => {
+    if (!editor) return;
+    try {
+      await navigator.clipboard.writeText(editor.getText());
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (error) {
+      console.error("Failed to copy:", error);
+    }
+  };
+
   const handleSchedule = (datetime: string) => {
     console.log("Scheduled for:", datetime);
     setScheduledPosts((prev) => [...prev, datetime]);
@@ -68,33 +84,56 @@ const AiWritingAssistant = () => {
         <p>Loading Editor...</p>
       )}
 
-      <div className="flex gap-2 mt-4">
-        <Button
-          color="blue"
-          className="px-6 py-2 rounded-lg bg-primary text-white hover:bg-accent transition"
-          onClick={() => handleAIAction("expand")}
-          disabled={loading}
-        >
-          {loading ? <Loader size="xs" color="white" /> : "Expand"}
-        </Button>
+      {/* Buttons Row */}
+      <div className="flex items-center justify-between mt-4">
+        {/* Left Side: AI Action Buttons */}
+        <div className="flex gap-2">
+          <Button
+            color="blue"
+            className="px-6 py-2 rounded-lg bg-primary text-white hover:bg-accent transition"
+            onClick={() => handleAIAction("expand")}
+            disabled={loading}
+          >
+            {loading ? <Loader size="xs" color="white" /> : "Expand"}
+          </Button>
 
-        <Button
-          color="green"
-          className="px-6 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 transition"
-          onClick={() => handleAIAction("rewrite")}
-          disabled={loading}
-        >
-          {loading ? <Loader size="xs" color="white" /> : "Rewrite"}
-        </Button>
+          <Button
+            color="green"
+            className="px-6 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 transition"
+            onClick={() => handleAIAction("rewrite")}
+            disabled={loading}
+          >
+            {loading ? <Loader size="xs" color="white" /> : "Rewrite"}
+          </Button>
 
-        <Button
-          color="yellow"
-          className="px-6 py-2 rounded-lg bg-yellow-500 hover:bg-yellow-600 transition"
-          onClick={() => handleAIAction("improve")}
-          disabled={loading}
-        >
-          {loading ? <Loader size="xs" color="black" /> : "Improve Grammar"}
-        </Button>
+          <Button
+            color="yellow"
+            className="px-6 py-2 rounded-lg bg-yellow-500 hover:bg-yellow-600 transition"
+            onClick={() => handleAIAction("improve")}
+            disabled={loading}
+          >
+            {loading ? <Loader size="xs" color="black" /> : "Improve Grammar"}
+          </Button>
+        </div>
+
+        {/* Right Side: Clear & Copy Buttons */}
+        <div className="flex gap-2">
+          <Button
+            color="gray"
+            className="px-4 py-2 rounded-lg bg-gray-500 text-white hover:bg-gray-600 transition"
+            onClick={handleCopy}
+          >
+            {copied ? "✅" : "📋"}
+          </Button>
+
+          <Button
+            color="red"
+            className="px-4 py-2 rounded-lg bg-red-500 text-white hover:bg-red-600 transition"
+            onClick={handleClear}
+          >
+            🗑️
+          </Button>
+        </div>
       </div>
 
       {/* ✅ Integrated Content Scheduler */}

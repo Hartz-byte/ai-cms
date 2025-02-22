@@ -14,16 +14,21 @@ export default async function handler(
 
   const { action, content, topic } = req.body;
   let prompt = "";
+  let maxTokens = 400;
 
+  // Action cases
   switch (action) {
     case "expand":
       prompt = `Expand on the following idea with more depth, details, and clarity while maintaining a natural and engaging tone. Provide multiple paragraphs if needed: "${content}"`;
+      maxTokens = 100;
       break;
     case "rewrite":
       prompt = `Rephrase the following text in a clearer, more professional, and natural way while preserving its original meaning. Make it sound engaging: "${content}"`;
+      maxTokens = 400;
       break;
     case "improve":
       prompt = `Refine the following text by enhancing its grammar, readability, and overall fluency while ensuring it sounds polished and natural. Provide an improved version: "${content}"`;
+      maxTokens = 400;
       break;
     case "generate":
       if (!topic) {
@@ -32,6 +37,14 @@ export default async function handler(
           .json({ error: "Topic is required for generation" });
       }
       prompt = `Write a detailed, engaging, and informative article about "${topic}". The response should include an introduction, key facts, and a conclusion. Keep it structured and easy to understand. Provide multiple paragraphs.`;
+      maxTokens = 800;
+      break;
+    case "seo_suggestions":
+      prompt = `Generate three trending blog topics, five SEO-friendly keywords, and one unique SEO tip. Format the response as:
+        Topics: [Topic1, Topic2, Topic3]
+        Keywords: [Keyword1, Keyword2, Keyword3, Keyword4, Keyword5]
+        SEO Tip: "Your SEO tip here."`;
+      maxTokens = 300;
       break;
     default:
       return res.status(400).json({ error: "Invalid action type" });
@@ -47,10 +60,10 @@ export default async function handler(
       {
         model: "command-xlarge-nightly",
         prompt: prompt,
-        max_tokens: 800, // Increased for more content
-        temperature: 0.9, // More creativity
-        k: 50, // Sampling for diverse output
-        p: 0.8, // Helps improve diversity
+        max_tokens: maxTokens,
+        temperature: 0.9,
+        k: 50,
+        p: 0.8,
       },
       {
         headers: {
@@ -60,9 +73,34 @@ export default async function handler(
       }
     );
 
-    return res
-      .status(200)
-      .json({ text: response.data.generations[0].text.trim() });
+    const generatedText = response.data.generations[0].text.trim();
+
+    // ✅ Extract topics, keywords, and tips from response text
+    const topicsMatch = generatedText.match(/Topics:\s*\[(.*?)\]/);
+    const keywordsMatch = generatedText.match(/Keywords:\s*\[(.*?)\]/);
+    const tipsMatch = generatedText.match(/SEO Tip:\s*"(.*?)"/);
+
+    const topics = topicsMatch
+      ? topicsMatch[1]
+          .split(",")
+          .map((t: string) => t.trim().replace(/^"|"$/g, ""))
+      : [];
+
+    const keywords = keywordsMatch
+      ? keywordsMatch[1]
+          .split(",")
+          .map((k: string) => k.trim().replace(/^"|"$/g, ""))
+      : [];
+
+    const tips = tipsMatch ? tipsMatch[1] : "No tip available";
+
+    // ✅ Return properly structured response
+    return res.status(200).json({
+      topics,
+      keywords,
+      tips,
+      text: response.data.generations[0].text.trim(),
+    });
   } catch (error: any) {
     console.error("Cohere API Error:", error.response?.data || error.message);
     return res
