@@ -1,3 +1,4 @@
+// pages/api/openai.ts
 import { NextApiRequest, NextApiResponse } from "next";
 import axios from "axios";
 
@@ -11,18 +12,26 @@ export default async function handler(
     return res.status(405).json({ error: "Method Not Allowed" });
   }
 
-  const { action, content } = req.body;
+  const { action, content, topic } = req.body;
   let prompt = "";
 
   switch (action) {
     case "expand":
-      prompt = `Expand on the following idea with more depth, details, and clarity while maintaining a natural and engaging tone: "${content}"`;
+      prompt = `Expand on the following idea with more depth, details, and clarity while maintaining a natural and engaging tone. Provide multiple paragraphs if needed: "${content}"`;
       break;
     case "rewrite":
-      prompt = `Rephrase the following text in a clearer, more professional, and natural way while preserving its original meaning: "${content}"`;
+      prompt = `Rephrase the following text in a clearer, more professional, and natural way while preserving its original meaning. Make it sound engaging: "${content}"`;
       break;
     case "improve":
-      prompt = `Refine the following text by enhancing its grammar, readability, and overall fluency while ensuring it sounds polished and natural: "${content}"`;
+      prompt = `Refine the following text by enhancing its grammar, readability, and overall fluency while ensuring it sounds polished and natural. Provide an improved version: "${content}"`;
+      break;
+    case "generate":
+      if (!topic) {
+        return res
+          .status(400)
+          .json({ error: "Topic is required for generation" });
+      }
+      prompt = `Write a detailed, engaging, and informative article about "${topic}". The response should include an introduction, key facts, and a conclusion. Keep it structured and easy to understand. Provide multiple paragraphs.`;
       break;
     default:
       return res.status(400).json({ error: "Invalid action type" });
@@ -38,7 +47,10 @@ export default async function handler(
       {
         model: "command-xlarge-nightly",
         prompt: prompt,
-        max_tokens: 100,
+        max_tokens: 800, // Increased for more content
+        temperature: 0.9, // More creativity
+        k: 50, // Sampling for diverse output
+        p: 0.8, // Helps improve diversity
       },
       {
         headers: {
@@ -47,8 +59,6 @@ export default async function handler(
         },
       }
     );
-
-    // console.log("AI response: ", response.data);
 
     return res
       .status(200)
