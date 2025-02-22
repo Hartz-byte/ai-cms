@@ -1,6 +1,6 @@
 // components/ContentScheduler/ContentScheduler.tsx
 import React, { useState } from "react";
-import { Button, Modal, Text, Image, Loader } from "@mantine/core";
+import { Button, Modal, Text, Image, Loader, TextInput } from "@mantine/core";
 import { DatePicker, TimeInput } from "@mantine/dates";
 import { useDropzone } from "react-dropzone";
 import dayjs from "dayjs";
@@ -14,6 +14,7 @@ const ContentScheduler = ({
   onSchedule,
 }: {
   onSchedule: (
+    name: string,
     datetime: string,
     mediaUrl?: string,
     altText?: string,
@@ -21,6 +22,7 @@ const ContentScheduler = ({
   ) => void;
 }) => {
   const [opened, setOpened] = useState<boolean>(false);
+  const [postName, setPostName] = useState<string>(""); // 🔹 New: Post Name
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedTime, setSelectedTime] = useState<string>("12:00");
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -30,11 +32,35 @@ const ContentScheduler = ({
 
   // Function to reset form data
   const resetForm = () => {
+    setPostName("");
     setSelectedDate(null);
     setSelectedTime("12:00");
     setImagePreview(null);
     setAltText("");
     setTags([]);
+  };
+
+  // Handle Scheduling
+  const handleSchedule = () => {
+    if (!postName.trim()) {
+      alert("⚠️ Please enter a post name!");
+      return;
+    }
+
+    if (selectedDate && selectedTime) {
+      const formattedDate = dayjs(selectedDate).format("YYYY-MM-DD");
+      const scheduledTime = `${formattedDate} ${selectedTime}`;
+
+      onSchedule(
+        postName,
+        scheduledTime,
+        imagePreview ?? undefined,
+        altText,
+        tags
+      );
+      setOpened(false);
+      resetForm();
+    }
   };
 
   // Handle Image Upload to Cloudinary
@@ -54,52 +80,24 @@ const ContentScheduler = ({
     formData.append("file", file);
     formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
 
-    // formData.append("auto_tagging", "0.7");
-    // formData.append("context", "alt=auto");
-
     try {
-      console.log(
-        "Uploading to Cloudinary with preset:",
-        CLOUDINARY_UPLOAD_PRESET
-      );
-
+      console.log("Uploading to Cloudinary...");
       const response = await axios.post(
         `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`,
         formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
+        { headers: { "Content-Type": "multipart/form-data" } }
       );
 
       console.log("Cloudinary Response:", response.data);
-
       const { secure_url, context, tags: uploadedTags } = response.data;
       setImagePreview(secure_url);
       setAltText(context?.custom?.alt || "");
       setTags(uploadedTags || []);
     } catch (error: any) {
-      console.error("Upload failed:", {
-        message: error.message,
-        response: error.response?.data,
-      });
-      // Add user feedback here
+      console.error("Upload failed:", error);
       alert("Failed to upload image. Please try again.");
     } finally {
       setUploading(false);
-    }
-  };
-
-  // Handle Scheduling
-  const handleSchedule = () => {
-    if (selectedDate && selectedTime) {
-      const formattedDate = dayjs(selectedDate).format("YYYY-MM-DD");
-      const scheduledTime = `${formattedDate} ${selectedTime}`;
-
-      onSchedule(scheduledTime, imagePreview ?? undefined, altText, tags);
-      setOpened(false);
-      resetForm();
     }
   };
 
@@ -110,9 +108,9 @@ const ContentScheduler = ({
   });
 
   return (
-    <div>
-      <h3 className="text-2xl font-semibold mb-4 text-gray-900 dark:text-white">
-        📅 Content Scheduler
+    <div className="p-6">
+      <h3 className="text-xl font-semibold mb-4 text-black dark:text-white">
+        🎯📝 Content Scheduler
       </h3>
 
       <Button
@@ -131,26 +129,26 @@ const ContentScheduler = ({
           resetForm();
         }}
         centered
-        portalProps={{ target: "body" }}
         overlayProps={{
           backgroundOpacity: 0.5,
           blur: 5,
         }}
         size="sm"
       >
-        {/* Centered Title */}
-        <Text
-          size="xl"
-          className="text-black text-center w-full block font-semibold"
-        >
+        <Text size="xl" className="text-black text-center font-semibold">
           Schedule Your Post 📝
         </Text>
 
-        {/* Centered Form */}
         <div className="flex flex-col items-center mt-4 space-y-4">
-          <Text size="sm" className="text-gray-500 text-center">
-            Choose a date and time for your scheduled post.
-          </Text>
+          {/* Post Name Input (Required) */}
+          <TextInput
+            label="Post Name"
+            placeholder="Enter a name for your post"
+            value={postName}
+            onChange={(event) => setPostName(event.currentTarget.value)}
+            required
+            className="w-3/4 text-black"
+          />
 
           {/* Date Picker */}
           <DatePicker
@@ -165,15 +163,13 @@ const ContentScheduler = ({
             onChange={(event) => setSelectedTime(event.currentTarget.value)}
             label="Select Time"
             className="w-2/3 text-black text-center"
-            styles={{
-              input: { textAlign: "center" },
-            }}
+            styles={{ input: { textAlign: "center" } }}
           />
 
           {/* Image Upload */}
           <div
             {...getRootProps()}
-            className="w-3/4 p-4 border-2 border-dashed border-gray-300 rounded-md cursor-pointer text-center"
+            className="w-3/4 p-4 border-2 border-dashed cursor-pointer text-center"
           >
             <input {...getInputProps()} />
             {uploading ? (
@@ -185,7 +181,7 @@ const ContentScheduler = ({
 
           {/* Preview Image */}
           {imagePreview && (
-            <div className="w-full flex flex-col items-center">
+            <div className="flex flex-col items-center">
               <Image
                 src={imagePreview}
                 alt="Preview"
@@ -197,36 +193,16 @@ const ContentScheduler = ({
             </div>
           )}
 
-          {/* Tags Display */}
-          {tags.length > 0 && (
-            <div className="flex flex-wrap gap-2 mt-2">
-              {tags.map((tag) => (
-                <span
-                  key={tag}
-                  className="bg-blue-200 text-blue-800 px-2 py-1 rounded-md text-sm"
-                >
-                  {tag}
-                </span>
-              ))}
-            </div>
-          )}
-
           {/* Action Buttons */}
           <div className="flex justify-end gap-3 w-full mt-4">
             <Button
               variant="outline"
               color="gray"
               onClick={() => setOpened(false)}
-              className="hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-300"
             >
               Cancel
             </Button>
-
-            <Button
-              color="green"
-              onClick={handleSchedule}
-              className="bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600 transition-all duration-300"
-            >
+            <Button color="green" onClick={handleSchedule}>
               Confirm Schedule
             </Button>
           </div>

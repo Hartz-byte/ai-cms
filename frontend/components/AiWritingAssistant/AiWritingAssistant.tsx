@@ -4,13 +4,11 @@ import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
 import { Button, Loader } from "@mantine/core";
-import ContentScheduler from "../ContentScheduler/ContentScheduler";
 import axios from "axios";
 
 const AiWritingAssistant = () => {
   const [loading, setLoading] = useState(false);
   const [isClient, setIsClient] = useState(false);
-  const [scheduledPosts, setScheduledPosts] = useState<string[]>([]);
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
@@ -64,12 +62,6 @@ const AiWritingAssistant = () => {
     } catch (error) {
       console.error("Failed to copy:", error);
     }
-  };
-
-  const handleSchedule = (datetime: string) => {
-    console.log("Scheduled for:", datetime);
-    setScheduledPosts((prev) => [...prev, datetime]);
-    alert(`✅ Post Scheduled for ${datetime}!`);
   };
 
   return (
@@ -135,25 +127,6 @@ const AiWritingAssistant = () => {
           </Button>
         </div>
       </div>
-
-      {/* ✅ Integrated Content Scheduler */}
-      <div className="mt-6">
-        <ContentScheduler onSchedule={handleSchedule} />
-      </div>
-
-      {/* ✅ Display Scheduled Posts */}
-      {scheduledPosts.length > 0 && (
-        <div className="mt-6 p-4 bg-gray-100 dark:bg-gray-800 rounded-lg">
-          <h3 className="text-lg font-semibold text-black dark:text-white mb-2">
-            📌 Scheduled Posts:
-          </h3>
-          <ul className="list-disc pl-5 text-black dark:text-white">
-            {scheduledPosts.map((post, index) => (
-              <li key={index}>{post}</li>
-            ))}
-          </ul>
-        </div>
-      )}
     </div>
   );
 };

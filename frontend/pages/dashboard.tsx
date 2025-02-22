@@ -6,8 +6,8 @@ import useAuth from "@/hooks/useAuth";
 import ContentEditor from "@/components/content/ContentEditor";
 import SEOOptimizer from "@/components/content/SEOOptimizer";
 import ScheduleAssistant from "@/components/content/ScheduleAssistant";
-import PerformancePrediction from "@/components/analytics/PerformancePrediction";
 import AiWritingAssistant from "@/components/AiWritingAssistant/AiWritingAssistant";
+import Scheduler from "@/components/ContentScheduler/Scheduler";
 
 const Dashboard: NextPage = () => {
   useAuth();
@@ -25,10 +25,10 @@ const Dashboard: NextPage = () => {
         <SEOOptimizer />
       </div>
 
-      {/* Scheduling & Performance Prediction */}
+      {/* Content Scheduling */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <ScheduleAssistant />
-        <PerformancePrediction />
+        <Scheduler />
       </div>
     </DashboardLayout>
   );

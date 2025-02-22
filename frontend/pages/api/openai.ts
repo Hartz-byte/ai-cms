@@ -46,6 +46,17 @@ export default async function handler(
         SEO Tip: "Your SEO tip here."`;
       maxTokens = 300;
       break;
+    case "schedule":
+      if (!topic) {
+        return res
+          .status(400)
+          .json({ error: "Topic is required for scheduling" });
+      }
+      prompt = `Analyze the best upcoming date and time to post content about "${topic}" based on engagement trends. The response should only suggest future times from today onwards. Also, generate five relevant hashtags for the post. Format the response as:
+          Best Time: "YYYY-MM-DD hh:mm A"
+          Hashtags: [#hashtag1, #hashtag2, #hashtag3, #hashtag4, #hashtag5]`;
+      maxTokens = 100;
+      break;
     default:
       return res.status(400).json({ error: "Invalid action type" });
   }
@@ -75,7 +86,7 @@ export default async function handler(
 
     const generatedText = response.data.generations[0].text.trim();
 
-    // ✅ Extract topics, keywords, and tips from response text
+    // Extract data for SEO Suggestions
     const topicsMatch = generatedText.match(/Topics:\s*\[(.*?)\]/);
     const keywordsMatch = generatedText.match(/Keywords:\s*\[(.*?)\]/);
     const tipsMatch = generatedText.match(/SEO Tip:\s*"(.*?)"/);
@@ -94,7 +105,47 @@ export default async function handler(
 
     const tips = tipsMatch ? tipsMatch[1] : "No tip available";
 
-    // ✅ Return properly structured response
+    // Extract data for Scheduling
+    const timeMatch = generatedText.match(/Best Time:\s*"(.*?)"/);
+    const hashtagsMatch = generatedText.match(/Hashtags:\s*\[(.*?)\]/);
+
+    let optimalTime = timeMatch ? timeMatch[1] : null;
+    const hashtags = hashtagsMatch
+      ? hashtagsMatch[1]
+          .split(",")
+          .map((h: string) => h.trim().replace(/^#|"/g, ""))
+      : [];
+
+    const currentTime = new Date();
+    let suggestedTime = optimalTime ? new Date(optimalTime) : null;
+
+    if (
+      !suggestedTime ||
+      isNaN(suggestedTime.getTime()) ||
+      suggestedTime < currentTime
+    ) {
+      suggestedTime = new Date();
+      suggestedTime.setDate(currentTime.getDate() + 1);
+      suggestedTime.setHours(12, 0, 0, 0);
+    }
+
+    const formattedTime = suggestedTime.toLocaleString("en-US", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    });
+
+    if (action === "schedule") {
+      return res.status(200).json({
+        optimalTime: formattedTime,
+        hashtags,
+        text: generatedText,
+      });
+    }
+
     return res.status(200).json({
       topics,
       keywords,
